@@ -36,6 +36,12 @@ body {
   width: 100%;
 }
 
+.mdc-button__label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* .mat-mdc-snack-bar-container.toast-success {
   --mdc-snackbar-container-color: #123b2a;
   --mdc-snackbar-supporting-text-color: #d9fbe7;

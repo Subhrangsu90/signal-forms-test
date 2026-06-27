@@ -1,4 +1,4 @@
-<div class="p-6 max-w-[1440px] mx-auto grid gap-6">
+<div class="p-6 max-w-360 mx-auto grid gap-6">
   <!-- Header Card -->
   <mat-card appearance="outlined" class="p-6">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -9,7 +9,7 @@
       </div>
 
       <div class="flex items-center gap-4">
-        <div class="grid gap-1 p-3 bg-slate-900/40 rounded-lg border border-slate-800 min-w-[140px]">
+        <div class="grid gap-1 p-3 bg-slate-900/40 rounded-lg border border-slate-800 min-w-35">
           <span class="text-xs font-semibold text-slate-400">Total Spent</span>
           <strong class="text-2xl font-bold text-indigo-400">{{ totalSpentFormatted() }}</strong>
         </div>
@@ -35,12 +35,14 @@
       @if (bookings().length) {
         <div class="grid gap-4">
           @for (booking of bookings(); track booking.id) {
-            <div class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_auto_auto_auto_auto] items-center">
+            <div
+              class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_auto_auto_auto_auto] items-center"
+            >
               <div class="grid gap-1">
                 <strong class="text-sm font-bold text-indigo-300">{{ booking.event.title }}</strong>
                 <span class="text-xs text-slate-400">
-                  {{ formatDate(booking.event.date) }} · {{ booking.event.category }}
-                  · by {{ booking.event.organizer }}
+                  {{ formatDate(booking.event.date) }} · {{ booking.event.category }} · by
+                  {{ booking.event.organizer }}
                 </span>
               </div>
 
@@ -58,7 +60,9 @@
 
               <div class="grid gap-0.5 text-center">
                 <span class="text-xs text-slate-400">{{ booking.ticketTier.tierName }}</span>
-                <span class="text-sm font-bold text-slate-200">{{ booking.quantity }} × ${{ booking.ticketTier.price }}</span>
+                <span class="text-sm font-bold text-slate-200"
+                  >{{ booking.quantity }} × ${{ booking.ticketTier.price }}</span
+                >
               </div>
 
               <span class="text-sm font-bold text-indigo-400">${{ booking.totalPrice }}</span>

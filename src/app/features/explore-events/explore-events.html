@@ -1,11 +1,13 @@
-<div class="p-6 max-w-[1440px] mx-auto grid gap-6">
+<div class="p-6 max-w-360 mx-auto grid gap-6">
   <!-- Header -->
   <mat-card appearance="outlined" class="p-6">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <p class="text-sm text-slate-400 font-medium mb-1">EventSync</p>
         <h1 id="explore-title" class="text-3xl font-bold tracking-tight m-0">Explore Events</h1>
-        <p class="text-sm text-slate-400 m-0 mt-1">Discover and book amazing events happening around you.</p>
+        <p class="text-sm text-slate-400 m-0 mt-1">
+          Discover and book amazing events happening around you.
+        </p>
       </div>
 
       <div class="flex items-center gap-3">
@@ -33,32 +35,33 @@
               <p class="text-xs text-slate-400 m-0 mt-1">by {{ event.organizer }}</p>
             </div>
             <mat-chip-set>
-              <mat-chip
-                [highlighted]="true"
-                class="text-xs"
-              >{{ event.status }}</mat-chip>
+              <mat-chip [highlighted]="true" class="text-xs">{{ event.status }}</mat-chip>
             </mat-chip-set>
           </div>
 
           <!-- Details -->
           <div class="grid grid-cols-2 gap-2 text-sm">
             <div class="flex items-center gap-1.5 text-slate-300">
-              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">calendar_today</mat-icon>
+              <mat-icon class="text-base w-4! h-4! text-[16px]!">calendar_today</mat-icon>
               <span>{{ formatDate(event.date) }}</span>
             </div>
             <div class="flex items-center gap-1.5 text-slate-300">
-              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">schedule</mat-icon>
+              <mat-icon class="text-base w-4! h-4! text-[16px]!">schedule</mat-icon>
               <span>{{ event.startTime }} – {{ event.endTime }}</span>
             </div>
             <div class="flex items-center gap-1.5 text-slate-300">
-              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">category</mat-icon>
+              <mat-icon class="text-base w-4! h-4! text-[16px]!">category</mat-icon>
               <span class="capitalize">{{ event.category }}</span>
             </div>
             <div class="flex items-center gap-1.5 text-slate-300">
-              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">
-                @if (event.format === 'virtual') { videocam }
-                @else if (event.format === 'hybrid') { device_hub }
-                @else { place }
+              <mat-icon class="text-base w-4! h-4! text-[16px]!">
+                @if (event.format === 'virtual') {
+                  videocam
+                } @else if (event.format === 'hybrid') {
+                  device_hub
+                } @else {
+                  place
+                }
               </mat-icon>
               <span class="capitalize">{{ event.format }}</span>
             </div>
@@ -67,7 +70,10 @@
           <!-- Venue/Stream -->
           @if (event.venueName) {
             <p class="text-xs text-slate-400 m-0">
-              📍 {{ event.venueName }}@if (event.venueCity) {, {{ event.venueCity }}}
+              📍 {{ event.venueName }}
+              @if (event.venueCity) {
+                , {{ event.venueCity }}
+              }
             </p>
           }
 
@@ -75,7 +81,9 @@
           @if (event.ticketTiers.length) {
             <div class="flex flex-wrap gap-2">
               @for (tier of event.ticketTiers; track tier.id) {
-                <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800">
+                <span
+                  class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800"
+                >
                   {{ tier.tierName }} — ${{ tier.price }}
                 </span>
               }
@@ -85,18 +93,18 @@
           <!-- Actions -->
           <div class="flex justify-between items-center mt-auto pt-2 border-t border-slate-800">
             <span class="text-sm font-semibold text-slate-300">
-              <mat-icon class="text-base !w-4 !h-4 !text-[16px] align-text-bottom">groups</mat-icon>
+              <mat-icon class="text-base w-4! h-4! text-[16px]! align-text-bottom">groups</mat-icon>
               {{ event.guests }} guests
             </span>
 
             @if (bookingSuccess() === event.id) {
-              <button mat-flat-button disabled class="!bg-emerald-900 !text-emerald-300">
+              <button matButton="filled" disabled class="bg-emerald-900! text-emerald-300!">
                 <mat-icon>check_circle</mat-icon>
                 Booked!
               </button>
             } @else {
               <button
-                mat-flat-button
+                matButton="filled"
                 color="primary"
                 [disabled]="bookingInProgress() === event.id || !event.ticketTiers.length"
                 (click)="bookEvent(event)"
@@ -117,7 +125,7 @@
     </div>
   } @else if (!isLoading()) {
     <mat-card appearance="outlined" class="p-12 text-center">
-      <mat-icon class="text-6xl !w-16 !h-16 !text-[64px] text-slate-600 mb-4">event_busy</mat-icon>
+      <mat-icon class="text-6xl w-16! h-16! text-[64px]! text-slate-600 mb-4">event_busy</mat-icon>
       <h2 class="text-xl font-bold text-slate-400 m-0">No Events Yet</h2>
       <p class="text-sm text-slate-500 mt-2">Be the first to create an event!</p>
       <a mat-flat-button color="primary" routerLink="/create-event" class="mt-4">
