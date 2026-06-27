@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, linkedSignal, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, resource, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   applyEach,
   debounce,
@@ -22,6 +23,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { environment } from '../../../environments/environment';
+import { EventService } from '../../shared/services/event.service';
 import { FormCheckbox, FormInput, FormSelect, FormDatepicker } from '../../shared/form-controls';
 import {
   categoryOptions,
@@ -50,6 +52,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateEvent {
+  private readonly eventService = inject(EventService);
+  private readonly router = inject(Router);
+
   protected readonly appName = environment.appName;
   protected readonly maxTicketTiers = environment.maxTicketTiers;
   protected readonly maxGuests = environment.maxGuests;
@@ -309,9 +314,16 @@ export class CreateEvent {
   protected onSubmit(): void {
     submit(this.eventForm, async () => {
       this.saveStatus.set('saving');
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      this.submittedEvent.set(this.eventModel());
-      this.saveStatus.set('saved');
+      try {
+        const result = await this.eventService.createEvent(this.eventModel());
+        this.submittedEvent.set(this.eventModel());
+        this.saveStatus.set('saved');
+        // Navigate to dashboard after a short delay so user sees the success state
+        setTimeout(() => this.router.navigate(['/dashboard']), 1200);
+      } catch (err) {
+        console.error('Create event failed:', err);
+        this.saveStatus.set('idle');
+      }
     });
   }
 }

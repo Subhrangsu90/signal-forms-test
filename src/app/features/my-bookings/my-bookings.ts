@@ -1,28 +1,39 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, resource, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { environment } from '../../../environments/environment';
-import { DashboardEvent, sampleEvents } from '../create-event/create-event.model';
+import { BookingService, BookingItem } from '../../shared/services/booking.service';
 
 @Component({
   selector: 'app-my-bookings',
-  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, MatProgressBarModule],
   templateUrl: './my-bookings.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyBookings {
   protected readonly appName = environment.appName;
-  protected readonly bookings = signal<readonly DashboardEvent[]>(sampleEvents);
+  private readonly bookingService = inject(BookingService);
 
-  protected readonly totalRevenue = computed(() => {
-    return this.bookings().reduce((sum, e) => sum + e.revenue, 0);
+  private readonly refreshTrigger = signal(0);
+
+  protected readonly bookingsResource = resource({
+    params: () => ({ refresh: this.refreshTrigger() }),
+    loader: () => this.bookingService.getMyBookings(),
   });
 
-  protected readonly totalRevenueFormatted = computed(() => {
-    const value = this.totalRevenue();
+  protected readonly bookings = computed(() => this.bookingsResource.value() ?? []);
+  protected readonly isLoading = computed(() => this.bookingsResource.isLoading());
+
+  protected readonly totalSpent = computed(() => {
+    return this.bookings().reduce((sum, b) => sum + Number(b.totalPrice), 0);
+  });
+
+  protected readonly totalSpentFormatted = computed(() => {
+    const value = this.totalSpent();
     if (value >= 1000) {
       return `$${(value / 1000).toFixed(1)}k`;
     }
@@ -34,7 +45,17 @@ export class MyBookings {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  protected formatRevenue(value: number): string {
-    return '$' + value.toLocaleString();
+  protected formatBookedAt(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  protected async cancelBooking(id: string): Promise<void> {
+    try {
+      await this.bookingService.cancelBooking(id);
+      this.refreshTrigger.update((v) => v + 1);
+    } catch (err) {
+      console.error('Cancel failed:', err);
+    }
   }
 }

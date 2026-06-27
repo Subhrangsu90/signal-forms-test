@@ -1,0 +1,95 @@
+<div class="auth-page">
+  <mat-card appearance="outlined" class="auth-card">
+    <mat-card-header class="auth-header">
+      <mat-icon class="auth-icon">person_add</mat-icon>
+      <mat-card-title class="auth-title">Create Account</mat-card-title>
+      <mat-card-subtitle class="auth-subtitle">Join EventSync and start creating events</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" class="mb-4"></mat-progress-bar>
+      }
+
+      @if (error()) {
+        <div class="auth-error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form (submit)="onSubmit($event)" class="auth-form" novalidate>
+        <div class="form-field">
+          <label for="register-name">Full Name</label>
+          <input
+            id="register-name"
+            type="text"
+            autocomplete="name"
+            placeholder="John Doe"
+            [value]="name()"
+            (input)="name.set($any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="register-email">Email</label>
+          <input
+            id="register-email"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="register-password">Password</label>
+          <input
+            id="register-password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Min. 6 characters"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="register-confirm">Confirm Password</label>
+          <input
+            id="register-confirm"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Repeat password"
+            [value]="confirmPassword()"
+            (input)="confirmPassword.set($any($event.target).value)"
+            required
+          />
+        </div>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="auth-submit"
+          [disabled]="loading() || !name() || !email() || !password() || !confirmPassword()"
+        >
+          @if (loading()) {
+            Creating account...
+          } @else {
+            Create Account
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="auth-footer">
+      <span class="text-sm text-slate-400">Already have an account?</span>
+      <a mat-button color="accent" routerLink="/login">Sign In</a>
+    </mat-card-actions>
+  </mat-card>
+</div>

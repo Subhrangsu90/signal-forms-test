@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -7,22 +8,27 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 
+// API routers
+import { authRouter } from './server/routes/auth';
+import { eventsRouter } from './server/routes/events';
+import { bookingsRouter } from './server/routes/bookings';
+
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Parse JSON request bodies for API routes.
  */
+app.use(express.json());
+
+/**
+ * API Routes — mounted before Angular SSR catch-all.
+ */
+app.use('/api/auth', authRouter);
+app.use('/api/events', eventsRouter);
+app.use('/api/bookings', bookingsRouter);
 
 /**
  * Serve static files from /browser

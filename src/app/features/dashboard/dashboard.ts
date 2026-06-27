@@ -1,21 +1,32 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, resource, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { environment } from '../../../environments/environment';
-import { DashboardEvent, sampleEvents } from '../create-event/create-event.model';
+import { EventService, EventListItem } from '../../shared/services/event.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, MatProgressBarModule],
   templateUrl: './dashboard.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
   protected readonly appName = environment.appName;
-  protected readonly events = signal<readonly DashboardEvent[]>(sampleEvents);
+  private readonly eventService = inject(EventService);
+
+  private readonly refreshTrigger = signal(0);
+
+  protected readonly eventsResource = resource({
+    params: () => ({ refresh: this.refreshTrigger() }),
+    loader: () => this.eventService.getMyEvents(),
+  });
+
+  protected readonly events = computed(() => this.eventsResource.value() ?? []);
+  protected readonly isLoading = computed(() => this.eventsResource.isLoading());
 
   protected readonly metrics = computed(() => {
     const events = this.events();
@@ -46,5 +57,14 @@ export class Dashboard {
 
   protected formatRevenue(value: number): string {
     return '$' + value.toLocaleString();
+  }
+
+  protected async deleteEvent(id: string): Promise<void> {
+    try {
+      await this.eventService.deleteEvent(id);
+      this.refreshTrigger.update((v) => v + 1);
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
   }
 }

@@ -12,6 +12,11 @@
     </a>
   </div>
 
+  <!-- Loading -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
   <!-- Metrics -->
   <div class="metrics-grid">
     @for (metric of metrics(); track metric.label) {
@@ -36,35 +41,51 @@
       <mat-card-title>Your events</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="events-grid">
-        @for (event of events(); track event.id) {
-          <mat-card appearance="outlined" class="event-card">
-            <mat-card-content>
-              <div class="event-header">
-                <strong class="event-title">{{ event.title }}</strong>
-                <mat-chip class="status-chip {{ event.status }}">
-                  @if (event.status === 'live') {
-                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #4ef0a0; margin-right: 6px; box-shadow: 0 0 8px #4ef0a0;"></span>
-                  }
-                  {{ event.status }}
-                </mat-chip>
-              </div>
-              <span class="event-date">{{ formatDate(event.date) }}</span>
-              <mat-chip class="format-chip">{{ event.format }}</mat-chip>
-              <div class="event-stats">
-                <span>
-                  <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-primary);">groups</mat-icon>
-                  Guests <strong>{{ event.guests }}</strong>
-                </span>
-                <span>
-                  <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-tertiary);">payments</mat-icon>
-                  Revenue <strong>{{ formatRevenue(event.revenue) }}</strong>
-                </span>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        }
-      </div>
+      @if (events().length) {
+        <div class="events-grid">
+          @for (event of events(); track event.id) {
+            <mat-card appearance="outlined" class="event-card">
+              <mat-card-content>
+                <div class="event-header">
+                  <strong class="event-title">{{ event.title }}</strong>
+                  <mat-chip class="status-chip {{ event.status }}">
+                    @if (event.status === 'live') {
+                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #4ef0a0; margin-right: 6px; box-shadow: 0 0 8px #4ef0a0;"></span>
+                    }
+                    {{ event.status }}
+                  </mat-chip>
+                </div>
+                <span class="event-date">{{ formatDate(event.date) }}</span>
+                <mat-chip class="format-chip">{{ event.format }}</mat-chip>
+                <div class="event-stats">
+                  <span>
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-primary);">groups</mat-icon>
+                    Guests <strong>{{ event.guests }}</strong>
+                  </span>
+                  <span>
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-tertiary);">payments</mat-icon>
+                    Revenue <strong>{{ formatRevenue(event.revenue) }}</strong>
+                  </span>
+                </div>
+                <div class="event-actions" style="margin-top: 8px; display: flex; justify-content: flex-end;">
+                  <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" title="Delete event">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      } @else if (!isLoading()) {
+        <div style="text-align: center; padding: 32px;">
+          <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: var(--mat-sys-outline);">event_busy</mat-icon>
+          <p style="color: var(--mat-sys-on-surface-variant); margin-top: 8px;">No events yet. Create your first event!</p>
+          <a mat-flat-button color="primary" routerLink="/create-event" style="margin-top: 12px;">
+            <mat-icon>add_circle</mat-icon>
+            Create Event
+          </a>
+        </div>
+      }
     </mat-card-content>
   </mat-card>
 </div>

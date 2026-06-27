@@ -3,6 +3,17 @@
     <mat-icon>menu</mat-icon>
   </button>
   <span class="app-brand">🎫 EventSync</span>
+
+  <span style="flex: 1;"></span>
+
+  @if (isLoggedIn()) {
+    <span style="font-size: 13px; color: var(--mat-sys-on-surface-variant); margin-right: 8px;">
+      {{ currentUser()?.name }}
+    </span>
+    <button mat-icon-button (click)="logout()" title="Sign out" aria-label="Sign out">
+      <mat-icon>logout</mat-icon>
+    </button>
+  }
 </mat-toolbar>
 
 <mat-sidenav-container class="app-sidenav-container">
@@ -13,7 +24,7 @@
     class="app-sidenav"
   >
     <mat-nav-list>
-      @for (link of navLinks; track link.path) {
+      @for (link of navLinks(); track link.path) {
         <a
           mat-list-item
           [routerLink]="link.path"
@@ -22,6 +33,14 @@
         >
           <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
           <span matListItemTitle>{{ link.label }}</span>
+        </a>
+      }
+
+      @if (isLoggedIn()) {
+        <mat-divider style="margin: 8px 0;"></mat-divider>
+        <a mat-list-item (click)="logout(); onNavClick()" style="cursor: pointer;">
+          <mat-icon matListItemIcon>logout</mat-icon>
+          <span matListItemTitle>Sign Out</span>
         </a>
       }
     </mat-nav-list>

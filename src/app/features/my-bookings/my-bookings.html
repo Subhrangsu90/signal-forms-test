@@ -5,21 +5,26 @@
       <div>
         <p class="text-sm text-slate-400 font-medium mb-1">{{ appName }}</p>
         <h1 class="text-3xl font-bold tracking-tight m-0">My Bookings</h1>
-        <p class="text-sm text-slate-400 m-0 mt-1">All your created events and their booking details.</p>
+        <p class="text-sm text-slate-400 m-0 mt-1">Events you've booked tickets for.</p>
       </div>
 
       <div class="flex items-center gap-4">
         <div class="grid gap-1 p-3 bg-slate-900/40 rounded-lg border border-slate-800 min-w-[140px]">
-          <span class="text-xs font-semibold text-slate-400">Total Revenue</span>
-          <strong class="text-2xl font-bold text-indigo-400">{{ totalRevenueFormatted() }}</strong>
+          <span class="text-xs font-semibold text-slate-400">Total Spent</span>
+          <strong class="text-2xl font-bold text-indigo-400">{{ totalSpentFormatted() }}</strong>
         </div>
-        <a mat-flat-button color="primary" routerLink="/create-event">
-          <mat-icon>add</mat-icon>
-          New Event
+        <a mat-flat-button color="primary" routerLink="/explore">
+          <mat-icon>search</mat-icon>
+          Explore Events
         </a>
       </div>
     </div>
   </mat-card>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
 
   <!-- Bookings List Card -->
   <mat-card appearance="outlined" class="p-6">
@@ -32,50 +37,51 @@
           @for (booking of bookings(); track booking.id) {
             <div class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_auto_auto_auto_auto] items-center">
               <div class="grid gap-1">
-                <strong class="text-sm font-bold text-indigo-300">{{ booking.title }}</strong>
-                <span class="text-xs text-slate-400">{{ formatDate(booking.date) }} · {{ booking.category }}</span>
+                <strong class="text-sm font-bold text-indigo-300">{{ booking.event.title }}</strong>
+                <span class="text-xs text-slate-400">
+                  {{ formatDate(booking.event.date) }} · {{ booking.event.category }}
+                  · by {{ booking.event.organizer }}
+                </span>
               </div>
 
               <span
                 class="inline-block w-fit rounded-full px-2.5 py-0.5 text-xs font-bold"
-                [class.bg-emerald-950]="booking.format === 'in-person'"
-                [class.text-emerald-400]="booking.format === 'in-person'"
-                [class.bg-sky-950]="booking.format === 'virtual'"
-                [class.text-sky-400]="booking.format === 'virtual'"
-                [class.bg-violet-950]="booking.format === 'hybrid'"
-                [class.text-violet-400]="booking.format === 'hybrid'"
+                [class.bg-emerald-950]="booking.event.format === 'in-person'"
+                [class.text-emerald-400]="booking.event.format === 'in-person'"
+                [class.bg-sky-950]="booking.event.format === 'virtual'"
+                [class.text-sky-400]="booking.event.format === 'virtual'"
+                [class.bg-violet-950]="booking.event.format === 'hybrid'"
+                [class.text-violet-400]="booking.event.format === 'hybrid'"
               >
-                {{ booking.format }}
+                {{ booking.event.format }}
               </span>
 
-              <span
-                class="inline-block w-fit rounded-full px-2.5 py-0.5 text-xs font-bold"
-                [class.bg-emerald-950]="booking.status === 'live'"
-                [class.text-emerald-400]="booking.status === 'live'"
-                [class.bg-indigo-950]="booking.status === 'upcoming'"
-                [class.text-indigo-400]="booking.status === 'upcoming'"
-                [class.bg-slate-800]="booking.status === 'completed'"
-                [class.text-slate-400]="booking.status === 'completed'"
+              <div class="grid gap-0.5 text-center">
+                <span class="text-xs text-slate-400">{{ booking.ticketTier.tierName }}</span>
+                <span class="text-sm font-bold text-slate-200">{{ booking.quantity }} × ${{ booking.ticketTier.price }}</span>
+              </div>
+
+              <span class="text-sm font-bold text-indigo-400">${{ booking.totalPrice }}</span>
+
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="cancelBooking(booking.id)"
+                title="Cancel booking"
               >
-                {{ booking.status }}
-              </span>
-
-              <span class="text-sm text-slate-300">
-                <strong class="text-slate-100">{{ booking.guests }}</strong> guests
-              </span>
-
-              <span class="text-sm font-bold text-indigo-400">{{ formatRevenue(booking.revenue) }}</span>
+                <mat-icon>cancel</mat-icon>
+              </button>
             </div>
           }
         </div>
-      } @else {
+      } @else if (!isLoading()) {
         <div class="grid place-items-center gap-4 py-16 text-center">
           <mat-icon class="text-slate-600 scale-[2.5] mb-4">confirmation_number</mat-icon>
           <div class="grid gap-2">
             <strong class="text-lg">No bookings yet</strong>
-            <p class="m-0 text-sm text-slate-400">Create your first event to see it here.</p>
+            <p class="m-0 text-sm text-slate-400">Explore events and book your first ticket!</p>
           </div>
-          <a mat-flat-button color="primary" routerLink="/create-event">Create Event</a>
+          <a mat-flat-button color="primary" routerLink="/explore">Explore Events</a>
         </div>
       }
     </mat-card-content>

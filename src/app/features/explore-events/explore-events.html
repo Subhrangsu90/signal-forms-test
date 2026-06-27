@@ -1,0 +1,129 @@
+<div class="p-6 max-w-[1440px] mx-auto grid gap-6">
+  <!-- Header -->
+  <mat-card appearance="outlined" class="p-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <p class="text-sm text-slate-400 font-medium mb-1">EventSync</p>
+        <h1 id="explore-title" class="text-3xl font-bold tracking-tight m-0">Explore Events</h1>
+        <p class="text-sm text-slate-400 m-0 mt-1">Discover and book amazing events happening around you.</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <mat-icon class="text-indigo-400">event_available</mat-icon>
+        <strong class="text-2xl font-bold text-indigo-400">{{ events().length }}</strong>
+        <span class="text-sm text-slate-400">events available</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <!-- Events Grid -->
+  @if (events().length) {
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      @for (event of events(); track event.id) {
+        <mat-card appearance="outlined" class="event-explore-card p-5 flex flex-col gap-3">
+          <!-- Top Row -->
+          <div class="flex justify-between items-start gap-2">
+            <div>
+              <h3 class="text-lg font-bold m-0 leading-tight">{{ event.title }}</h3>
+              <p class="text-xs text-slate-400 m-0 mt-1">by {{ event.organizer }}</p>
+            </div>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="true"
+                class="text-xs"
+              >{{ event.status }}</mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <!-- Details -->
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">calendar_today</mat-icon>
+              <span>{{ formatDate(event.date) }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">schedule</mat-icon>
+              <span>{{ event.startTime }} – {{ event.endTime }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">category</mat-icon>
+              <span class="capitalize">{{ event.category }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <mat-icon class="text-base !w-4 !h-4 !text-[16px]">
+                @if (event.format === 'virtual') { videocam }
+                @else if (event.format === 'hybrid') { device_hub }
+                @else { place }
+              </mat-icon>
+              <span class="capitalize">{{ event.format }}</span>
+            </div>
+          </div>
+
+          <!-- Venue/Stream -->
+          @if (event.venueName) {
+            <p class="text-xs text-slate-400 m-0">
+              📍 {{ event.venueName }}@if (event.venueCity) {, {{ event.venueCity }}}
+            </p>
+          }
+
+          <!-- Ticket Tiers -->
+          @if (event.ticketTiers.length) {
+            <div class="flex flex-wrap gap-2">
+              @for (tier of event.ticketTiers; track tier.id) {
+                <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800">
+                  {{ tier.tierName }} — ${{ tier.price }}
+                </span>
+              }
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="flex justify-between items-center mt-auto pt-2 border-t border-slate-800">
+            <span class="text-sm font-semibold text-slate-300">
+              <mat-icon class="text-base !w-4 !h-4 !text-[16px] align-text-bottom">groups</mat-icon>
+              {{ event.guests }} guests
+            </span>
+
+            @if (bookingSuccess() === event.id) {
+              <button mat-flat-button disabled class="!bg-emerald-900 !text-emerald-300">
+                <mat-icon>check_circle</mat-icon>
+                Booked!
+              </button>
+            } @else {
+              <button
+                mat-flat-button
+                color="primary"
+                [disabled]="bookingInProgress() === event.id || !event.ticketTiers.length"
+                (click)="bookEvent(event)"
+              >
+                @if (bookingInProgress() === event.id) {
+                  Booking...
+                } @else {
+                  <ng-container>
+                    <mat-icon>confirmation_number</mat-icon>
+                    Book Now
+                  </ng-container>
+                }
+              </button>
+            }
+          </div>
+        </mat-card>
+      }
+    </div>
+  } @else if (!isLoading()) {
+    <mat-card appearance="outlined" class="p-12 text-center">
+      <mat-icon class="text-6xl !w-16 !h-16 !text-[64px] text-slate-600 mb-4">event_busy</mat-icon>
+      <h2 class="text-xl font-bold text-slate-400 m-0">No Events Yet</h2>
+      <p class="text-sm text-slate-500 mt-2">Be the first to create an event!</p>
+      <a mat-flat-button color="primary" routerLink="/create-event" class="mt-4">
+        <mat-icon>add_circle</mat-icon>
+        Create Event
+      </a>
+    </mat-card>
+  }
+</div>

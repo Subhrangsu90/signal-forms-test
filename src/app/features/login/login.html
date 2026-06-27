@@ -1,0 +1,69 @@
+<div class="auth-page">
+  <mat-card appearance="outlined" class="auth-card">
+    <mat-card-header class="auth-header">
+      <mat-icon class="auth-icon">lock_open</mat-icon>
+      <mat-card-title class="auth-title">Welcome back</mat-card-title>
+      <mat-card-subtitle class="auth-subtitle">Sign in to your EventSync account</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" class="mb-4"></mat-progress-bar>
+      }
+
+      @if (error()) {
+        <div class="auth-error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form (submit)="onSubmit($event)" class="auth-form" novalidate>
+        <div class="form-field">
+          <label for="login-email">Email</label>
+          <input
+            id="login-email"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="login-password">Password</label>
+          <input
+            id="login-password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+            required
+          />
+        </div>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="auth-submit"
+          [disabled]="loading() || !email() || !password()"
+        >
+          @if (loading()) {
+            Signing in...
+          } @else {
+            Sign In
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="auth-footer">
+      <span class="text-sm text-slate-400">Don't have an account?</span>
+      <a mat-button color="accent" routerLink="/register">Create Account</a>
+    </mat-card-actions>
+  </mat-card>
+</div>
