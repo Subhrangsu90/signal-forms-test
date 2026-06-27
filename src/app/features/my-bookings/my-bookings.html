@@ -1,0 +1,88 @@
+<main
+  class="min-h-dvh bg-slate-50 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.18),transparent_38%)] px-4 py-4 text-slate-950 sm:px-8 sm:py-8"
+>
+  <div class="mx-auto grid w-full max-w-[1440px] gap-5">
+    <!-- Header -->
+    <header class="grid gap-4 rounded-lg border border-slate-200 bg-white/90 p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-6">
+      <div class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div class="grid gap-1">
+          <p class="m-0 text-sm text-slate-500">{{ appName }}</p>
+          <h1 class="m-0 text-[clamp(2rem,5vw,3.5rem)] leading-none font-bold">My bookings</h1>
+          <span class="text-sm text-slate-500">All your created events and their booking details.</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="grid gap-1 rounded-md border border-slate-200 bg-indigo-50/70 p-3">
+            <span class="text-xs font-semibold text-slate-500">Total revenue</span>
+            <strong class="text-2xl leading-none">{{ totalRevenueFormatted() }}</strong>
+          </div>
+          <a
+            class="flex min-h-11 items-center justify-center rounded-md bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700"
+            routerLink="/create-event"
+          >
+            + New event
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Bookings list -->
+    <section class="rounded-lg border border-slate-200 bg-white/90 p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-6">
+      @if (bookings().length) {
+        <div class="grid gap-4">
+          @for (booking of bookings(); track booking.id) {
+            <div class="grid gap-4 rounded-md border border-slate-200 bg-white p-4 hover:border-indigo-300 hover:shadow-sm sm:grid-cols-[1fr_auto_auto_auto_auto] sm:items-center">
+              <div class="grid gap-1">
+                <strong class="text-sm">{{ booking.title }}</strong>
+                <span class="text-xs text-slate-500">{{ formatDate(booking.date) }} · {{ booking.category }}</span>
+              </div>
+
+              <span
+                class="w-fit rounded-full px-2.5 py-1 text-xs font-bold"
+                [class.bg-emerald-50]="booking.format === 'in-person'"
+                [class.text-emerald-700]="booking.format === 'in-person'"
+                [class.bg-sky-50]="booking.format === 'virtual'"
+                [class.text-sky-700]="booking.format === 'virtual'"
+                [class.bg-violet-50]="booking.format === 'hybrid'"
+                [class.text-violet-700]="booking.format === 'hybrid'"
+              >
+                {{ booking.format }}
+              </span>
+
+              <span
+                class="w-fit rounded-full px-2.5 py-1 text-xs font-bold"
+                [class.bg-emerald-50]="booking.status === 'live'"
+                [class.text-emerald-700]="booking.status === 'live'"
+                [class.bg-indigo-50]="booking.status === 'upcoming'"
+                [class.text-indigo-700]="booking.status === 'upcoming'"
+                [class.bg-slate-100]="booking.status === 'completed'"
+                [class.text-slate-600]="booking.status === 'completed'"
+              >
+                {{ booking.status }}
+              </span>
+
+              <span class="text-sm text-slate-500">
+                <strong class="text-slate-950">{{ booking.guests }}</strong> guests
+              </span>
+
+              <span class="text-sm font-bold">${{ booking.revenue.toLocaleString() }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="grid place-items-center gap-4 py-16 text-center">
+          <div class="grid gap-2">
+            <strong class="text-lg">No bookings yet</strong>
+            <p class="m-0 text-sm text-slate-500">Create your first event to see it here.</p>
+          </div>
+          <a
+            class="flex min-h-11 items-center justify-center rounded-md bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700"
+            routerLink="/create-event"
+          >
+            Create event
+          </a>
+        </div>
+      }
+    </section>
+  </div>
+</main>

@@ -4,21 +4,28 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'client-intake',
+    redirectTo: 'dashboard',
   },
   {
-    path: 'client-intake',
-    title: 'Client Intake',
+    path: 'dashboard',
+    title: 'Dashboard — EventSync',
     loadComponent: () =>
-      import('./features/client-intake/client-intake').then((component) => component.ClientIntake),
+      import('./features/dashboard/dashboard').then((c) => c.Dashboard),
   },
   {
-    path: 'user-details',
-    title: 'User Details',
-    loadComponent: () => import('./features/user-details/user-details').then((component) => component.UserDetails),
+    path: 'create-event',
+    title: 'Create Event — EventSync',
+    loadComponent: () =>
+      import('./features/create-event/create-event').then((c) => c.CreateEvent),
+  },
+  {
+    path: 'my-bookings',
+    title: 'My Bookings — EventSync',
+    loadComponent: () =>
+      import('./features/my-bookings/my-bookings').then((c) => c.MyBookings),
   },
   {
     path: '**',
-    redirectTo: 'client-intake',
+    redirectTo: 'dashboard',
   },
 ];
