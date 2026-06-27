@@ -1,0 +1,38 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--mat-sys-surface-container);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.app-brand {
+  font-weight: 600;
+  font-size: 18px;
+  margin-left: 8px;
+  letter-spacing: -0.01em;
+}
+
+.app-sidenav-container {
+  flex: 1;
+}
+
+.app-sidenav {
+  width: 240px;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+}
+
+.app-content {
+  min-height: 100%;
+}
+
+.active-link {
+  background: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent) !important;
+  color: var(--mat-sys-primary) !important;
+}

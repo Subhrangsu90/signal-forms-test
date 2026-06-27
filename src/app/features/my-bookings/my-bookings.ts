@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
 import { environment } from '../../../environments/environment';
 import { DashboardEvent, sampleEvents } from '../create-event/create-event.model';
 
 @Component({
   selector: 'app-my-bookings',
-  imports: [RouterLink],
+  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
   templateUrl: './my-bookings.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,5 +32,9 @@ export class MyBookings {
   protected formatDate(dateStr: string): string {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  protected formatRevenue(value: number): string {
+    return '$' + value.toLocaleString();
   }
 }

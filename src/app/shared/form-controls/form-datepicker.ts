@@ -2,21 +2,22 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormFieldError } from './form-field-error';
 
 @Component({
-  selector: 'app-form-textarea',
-  imports: [FormField, FormFieldError, MatFormFieldModule, MatInputModule],
+  selector: 'app-form-datepicker',
+  imports: [FormField, FormFieldError, MatFormFieldModule, MatInputModule, MatDatepickerModule],
   template: `
     <mat-form-field appearance="outline" [class.full-width]="true">
       <mat-label>{{ label() }}</mat-label>
-      <textarea
+      <input
         matInput
-        rows="3"
-        [autocomplete]="autocomplete()"
-        [placeholder]="placeholder()"
+        [matDatepicker]="picker"
         [formField]="field()"
-      ></textarea>
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
       <app-form-field-error [field]="field()" />
     </mat-form-field>
   `,
@@ -30,10 +31,7 @@ import { FormFieldError } from './form-field-error';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormTextarea {
+export class FormDatepicker {
   readonly label = input.required<string>();
   readonly field = input.required<FieldTree<string>>();
-  readonly autocomplete = input('');
-  readonly placeholder = input('');
-  readonly wide = input(false);
 }

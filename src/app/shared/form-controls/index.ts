@@ -3,4 +3,5 @@ export { FormFieldError } from './form-field-error';
 export { FormInput } from './form-input';
 export { FormSelect } from './form-select';
 export { FormTextarea } from './form-textarea';
+export { FormDatepicker } from './form-datepicker';
 export type { SelectOption } from './form-select';

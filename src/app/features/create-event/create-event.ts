@@ -15,8 +15,14 @@ import {
   validate,
   validateAsync,
 } from '@angular/forms/signals';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDividerModule } from '@angular/material/divider';
 import { environment } from '../../../environments/environment';
-import { FormCheckbox, FormInput, FormSelect } from '../../shared/form-controls';
+import { FormCheckbox, FormInput, FormSelect, FormDatepicker } from '../../shared/form-controls';
 import {
   categoryOptions,
   createEventData,
@@ -28,7 +34,18 @@ import {
 
 @Component({
   selector: 'app-create-event',
-  imports: [FormCheckbox, FormInput, FormSelect],
+  imports: [
+    FormCheckbox,
+    FormInput,
+    FormSelect,
+    FormDatepicker,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatProgressBarModule,
+    MatDividerModule,
+  ],
   templateUrl: './create-event.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,12 +64,10 @@ export class CreateEvent {
   protected readonly suggestedVenue = linkedSignal(() => suggestedVenues[this.selectedCategory()]);
 
   protected readonly eventForm = form(this.eventModel, (path) => {
-    // ── Debounce ──
     debounce(path.event.email, 300);
     debounce(path.event.phone, 250);
     debounce(path.extras.promoCode, 400);
 
-    // ── Event basics ──
     required(path.event.title, { message: 'Event title is required' });
     minLength(path.event.title, 3, { message: 'Use at least 3 characters' });
     maxLength(path.event.title, 80, { message: 'Keep title under 80 characters' });
@@ -82,7 +97,6 @@ export class CreateEvent {
       message: 'Use 7-15 digits, spaces, hyphens, or a leading +',
     });
 
-    // ── Venue (conditional on format) ──
     hidden(path.venue.name, ({ valueOf }) => valueOf(path.event.format) === 'virtual');
     hidden(path.venue.address, ({ valueOf }) => valueOf(path.event.format) === 'virtual');
     hidden(path.venue.city, ({ valueOf }) => valueOf(path.event.format) === 'virtual');
@@ -115,7 +129,6 @@ export class CreateEvent {
       when: ({ valueOf }) => valueOf(path.event.format) !== 'in-person',
     });
 
-    // ── Date & time ──
     required(path.venue.date, { message: 'Event date is required' });
     validate(path.venue.date, ({ value }) => {
       const rawDate = value();
@@ -158,7 +171,6 @@ export class CreateEvent {
       return undefined;
     });
 
-    // ── Tickets (dynamic array) ──
     applyEach(path.tickets, (ticket) => {
       required(ticket.tierName, { message: 'Tier name is required' });
       min(ticket.price, 0, { message: 'Price cannot be negative' });
@@ -166,14 +178,12 @@ export class CreateEvent {
       max(ticket.quantity, 1000, { message: 'Max 1000 tickets per tier' });
     });
 
-    // ── Guests (dynamic array) ──
     applyEach(path.guests, (guest) => {
       required(guest.name, { message: 'Guest name is required' });
       required(guest.email, { message: 'Guest email is required' });
       email(guest.email, { message: 'Enter a valid email address' });
     });
 
-    // ── Promo code (async) ──
     validateAsync(path.extras.promoCode, {
       params: ({ value }) => value(),
       factory: (codeValue) =>
@@ -192,11 +202,9 @@ export class CreateEvent {
       onError: () => ({ kind: 'promoCheckFailed', message: 'Promo check failed' }),
     });
 
-    // ── Terms ──
     required(path.terms.agreeToTerms, { message: 'You must agree to the terms' });
   });
 
-  protected readonly formErrors = computed(() => this.eventForm().errorSummary());
 
   protected readonly completionPercent = computed(() => {
     const event = this.eventModel();
@@ -217,7 +225,13 @@ export class CreateEvent {
       ...event.tickets.flatMap((t) => [t.tierName, String(t.price), String(t.quantity)]),
       ...event.guests.flatMap((g) => [g.name, g.email]),
     ];
-    const completed = values.filter((v) => v.trim().length > 0).length;
+    const completed = values.filter((v: any) => {
+      if (!v) {
+        return false;
+      }
+      const str = typeof v === 'string' ? v : (v instanceof Date ? v.toISOString() : String(v));
+      return str.trim().length > 0;
+    }).length;
     return Math.round((completed / values.length) * 100);
   });
 

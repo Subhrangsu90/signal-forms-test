@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-form-field-error',
+  imports: [MatFormFieldModule],
   template: `
     @if (field()().touched() && field()().errors().length) {
-      <small class="text-xs font-semibold text-rose-700">
+      <mat-error>
         {{ field()().errors()[0].message }}
-      </small>
+      </mat-error>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
