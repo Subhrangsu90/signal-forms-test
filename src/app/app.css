@@ -19,6 +19,20 @@
   letter-spacing: -0.01em;
 }
 
+.toolbar-spacer {
+  flex: 1;
+}
+
+.toolbar-user {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+  margin-right: 8px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .app-sidenav-container {
   flex: 1;
 }
@@ -43,6 +57,10 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 8px;
+}
+
+.sidebar-divider {
+  margin: 8px 0;
 }
 
 .sidebar-user {

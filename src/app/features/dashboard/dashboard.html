@@ -50,7 +50,7 @@
                   <strong class="event-title">{{ event.title }}</strong>
                   <mat-chip class="status-chip {{ event.status }}">
                     @if (event.status === 'live') {
-                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #4ef0a0; margin-right: 6px; box-shadow: 0 0 8px #4ef0a0;"></span>
+                      <span class="status-dot"></span>
                     }
                     {{ event.status }}
                   </mat-chip>
@@ -59,35 +59,35 @@
                 <mat-chip class="format-chip">{{ event.format }}</mat-chip>
                 <div class="event-stats">
                   <span>
-                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-primary);">confirmation_number</mat-icon>
+                    <mat-icon class="stat-icon primary">confirmation_number</mat-icon>
                     Sold <strong>{{ event.ticketsSold }}</strong>
                   </span>
                   <span>
-                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-tertiary);">inventory_2</mat-icon>
+                    <mat-icon class="stat-icon tertiary">inventory_2</mat-icon>
                     Left <strong>{{ event.ticketsLeft }}</strong>
                   </span>
                   <span>
-                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-primary);">groups</mat-icon>
+                    <mat-icon class="stat-icon primary">groups</mat-icon>
                     Guests <strong>{{ event.guests }}</strong>
                   </span>
                   <span>
-                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-tertiary);">payments</mat-icon>
+                    <mat-icon class="stat-icon tertiary">payments</mat-icon>
                     Revenue <strong>{{ formatRevenue(event.revenue) }}</strong>
                   </span>
                 </div>
 
                 @if (event.ticketTiers.length) {
-                  <div style="display: grid; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--mat-sys-outline-variant);">
+                  <div class="ticket-tier-list">
                     @for (tier of event.ticketTiers; track tier.id) {
-                      <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--mat-sys-on-surface-variant);">
+                      <div class="ticket-tier-row">
                         <span>{{ tier.tierName }} · ${{ tier.price }}</span>
-                        <strong style="color: var(--mat-sys-on-surface);">{{ tier.quantity }} left</strong>
+                        <strong>{{ tier.quantity }} left</strong>
                       </div>
                     }
                   </div>
                 }
 
-                <div class="event-actions" style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+                <div class="event-actions">
                   <a mat-button [routerLink]="['/events', event.id, 'edit']">
                     <mat-icon>edit</mat-icon>
                     Edit
@@ -96,13 +96,13 @@
                     <mat-icon>bar_chart</mat-icon>
                     @if (selectedEventId() === event.id) { Hide sales } @else { Sales }
                   </button>
-                  <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" title="Delete event">
+                  <button mat-icon-button color="warn" type="button" (click)="deleteEvent(event.id)" title="Delete event" aria-label="Delete event">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
 
                 @if (selectedEventId() === event.id) {
-                  <div style="display: grid; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--mat-sys-outline-variant);">
+                  <div class="sales-panel">
                     @if (salesLoading()) {
                       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                     } @else if (salesReport()) {
@@ -113,27 +113,27 @@
                         <span>Revenue <strong>{{ formatRevenue(salesReport()!.totals.revenue) }}</strong></span>
                       </div>
 
-                      <div style="display: grid; gap: 8px;">
-                        <strong style="font-size: 13px; color: var(--mat-sys-primary);">Ticket tiers</strong>
+                      <div class="sales-section">
+                        <strong class="sales-title">Ticket tiers</strong>
                         @for (ticket of salesReport()!.tickets; track ticket.id) {
-                          <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 12px; color: var(--mat-sys-on-surface-variant);">
+                          <div class="sales-ticket-row">
                             <span>{{ ticket.tierName }} · ${{ ticket.price }}</span>
-                            <strong style="color: var(--mat-sys-on-surface);">{{ ticket.sold }} sold / {{ ticket.left }} left</strong>
+                            <strong>{{ ticket.sold }} sold / {{ ticket.left }} left</strong>
                           </div>
                         }
                       </div>
 
-                      <div style="display: grid; gap: 8px;">
-                        <strong style="font-size: 13px; color: var(--mat-sys-primary);">Buyers</strong>
+                      <div class="sales-section">
+                        <strong class="sales-title">Buyers</strong>
                         @if (salesReport()!.buyers.length) {
                           @for (buyer of salesReport()!.buyers; track buyer.bookingId) {
-                            <div style="display: grid; gap: 2px; padding: 8px; border: 1px solid var(--mat-sys-outline-variant); border-radius: 8px; font-size: 12px;">
+                            <div class="buyer-card">
                               <strong>{{ buyer.name }} · {{ buyer.email }}</strong>
-                              <span style="color: var(--mat-sys-on-surface-variant);">{{ buyer.ticketTier }} · Qty {{ buyer.quantity }} · ${{ buyer.totalPrice }} · {{ formatBookedAt(buyer.bookedAt) }}</span>
+                              <span>{{ buyer.ticketTier }} · Qty {{ buyer.quantity }} · ${{ buyer.totalPrice }} · {{ formatBookedAt(buyer.bookedAt) }}</span>
                             </div>
                           }
                         } @else {
-                          <span style="font-size: 12px; color: var(--mat-sys-on-surface-variant);">No buyers yet.</span>
+                          <span class="muted-note">No buyers yet.</span>
                         }
                       </div>
                     }
@@ -144,10 +144,10 @@
           }
         </div>
       } @else if (!isLoading()) {
-        <div style="text-align: center; padding: 32px;">
-          <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: var(--mat-sys-outline);">event_busy</mat-icon>
-          <p style="color: var(--mat-sys-on-surface-variant); margin-top: 8px;">No events yet. Create your first event!</p>
-          <a mat-flat-button color="primary" routerLink="/create-event" style="margin-top: 12px;">
+        <div class="empty-state">
+          <mat-icon class="empty-state-icon">event_busy</mat-icon>
+          <p>No events yet. Create your first event!</p>
+          <a mat-flat-button color="primary" routerLink="/create-event">
             <mat-icon>add_circle</mat-icon>
             Create Event
           </a>
@@ -156,4 +156,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-

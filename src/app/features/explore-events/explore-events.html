@@ -69,11 +69,14 @@
 
           <!-- Venue/Stream -->
           @if (event.venueName) {
-            <p class="text-xs text-slate-400 m-0">
-              📍 {{ event.venueName }}
-              @if (event.venueCity) {
-                , {{ event.venueCity }}
-              }
+            <p class="text-xs text-slate-400 m-0 flex items-center gap-1.5">
+              <mat-icon class="text-base w-4! h-4! text-[16px]!">place</mat-icon>
+              <span>
+                {{ event.venueName }}
+                @if (event.venueCity) {
+                  , {{ event.venueCity }}
+                }
+              </span>
             </p>
           }
 

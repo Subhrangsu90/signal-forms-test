@@ -296,6 +296,123 @@ body {
   display: block;
 }
 
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #4ef0a0;
+  margin-right: 6px;
+  box-shadow: 0 0 8px #4ef0a0;
+}
+
+.stat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.stat-icon.primary {
+  color: var(--mat-sys-primary);
+}
+
+.stat-icon.tertiary {
+  color: var(--mat-sys-tertiary);
+}
+
+.ticket-tier-list,
+.sales-panel,
+.sales-section {
+  display: grid;
+  gap: 8px;
+}
+
+.ticket-tier-list {
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.ticket-tier-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.ticket-tier-row strong,
+.sales-ticket-row strong {
+  color: var(--mat-sys-on-surface);
+}
+
+.event-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sales-panel {
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.sales-title {
+  font-size: 13px;
+  color: var(--mat-sys-primary);
+}
+
+.sales-ticket-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.buyer-card {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.buyer-card span,
+.muted-note {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.muted-note {
+  font-size: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--mat-sys-outline);
+}
+
+.empty-state p {
+  color: var(--mat-sys-on-surface-variant);
+  margin-top: 8px;
+}
+
+.empty-state a {
+  margin-top: 12px;
+}
 /* Code preview block */
 .code-preview {
   background: #09090f;

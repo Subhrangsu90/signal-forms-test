@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
@@ -7,7 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { map } from 'rxjs';
 import { AuthService } from './shared/services/auth.service';
+import { ToastService } from './shared/services/toast.service';
 
 @Component({
   selector: 'app-root',
@@ -27,18 +30,18 @@ import { AuthService } from './shared/services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  @ViewChild('sidenav') sidenav!: MatSidenav;
+  @ViewChild('sidenav') sidenav?: MatSidenav;
 
   protected readonly authService = inject(AuthService);
-  protected readonly isMobile = signal(false);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly toast = inject(ToastService);
+
+  protected readonly isMobile = toSignal(
+    this.breakpointObserver.observe('(max-width: 959px)').pipe(map((result) => result.matches)),
+    { initialValue: false },
+  );
   protected readonly isLoggedIn = this.authService.isLoggedIn;
   protected readonly currentUser = this.authService.currentUser;
-
-  constructor(breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe('(max-width: 959px)').subscribe((result) => {
-      this.isMobile.set(result.matches);
-    });
-  }
 
   protected readonly publicLinks = [
     { path: '/explore', label: 'Explore Events', icon: 'travel_explore' },
@@ -64,12 +67,13 @@ export class App {
 
   protected onNavClick(): void {
     if (this.isMobile()) {
-      this.sidenav.close();
+      void this.sidenav?.close();
     }
   }
 
   protected logout(): void {
     this.authService.logout();
+    this.toast.success('Signed out successfully.');
     this.onNavClick();
   }
 }
