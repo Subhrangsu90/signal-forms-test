@@ -2,7 +2,8 @@
 @import 'tailwindcss';
 
 /* Ensure full-height layout */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   background-color: var(--mat-sys-surface);
@@ -34,6 +35,24 @@ html, body {
 .mat-mdc-form-field {
   width: 100%;
 }
+
+/* .mat-mdc-snack-bar-container.toast-success {
+  --mdc-snackbar-container-color: #123b2a;
+  --mdc-snackbar-supporting-text-color: #d9fbe7;
+  --mat-snack-bar-button-color: #7df0ad;
+}
+
+.mat-mdc-snack-bar-container.toast-error {
+  --mdc-snackbar-container-color: #3f1717;
+  --mdc-snackbar-supporting-text-color: #ffe1e1;
+  --mat-snack-bar-button-color: #ffb4ab;
+}
+
+.mat-mdc-snack-bar-container.toast-info {
+  --mdc-snackbar-container-color: #173247;
+  --mdc-snackbar-supporting-text-color: #d7edff;
+  --mat-snack-bar-button-color: #9ad2ff;
+} */
 
 /* Layout helper classes */
 .page-container {
@@ -111,7 +130,6 @@ html, body {
 }
 
 .metric-card:hover {
-  transform: translateY(-2px);
   border-color: var(--mat-sys-primary) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 12px color-mix(in srgb, var(--mat-sys-primary) 15%, transparent) !important;
 }
@@ -196,7 +214,6 @@ html, body {
 }
 
 .event-card:hover {
-  transform: translateY(-4px);
   border-color: var(--mat-sys-tertiary) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 12px color-mix(in srgb, var(--mat-sys-tertiary) 15%, transparent) !important;
 }
@@ -412,8 +429,6 @@ html, body {
 }
 
 .event-explore-card:hover {
-  transform: translateY(-4px);
   border-color: var(--mat-sys-primary) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 12px color-mix(in srgb, var(--mat-sys-primary) 15%, transparent) !important;
 }
-

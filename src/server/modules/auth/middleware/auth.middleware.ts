@@ -1,10 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-
-export interface AuthPayload {
-  id: string;
-  email: string;
-}
+import { AuthPayload } from '../model/auth.model';
 
 declare global {
   namespace Express {

@@ -40,19 +40,16 @@ export class App {
     });
   }
 
-  /** Public nav links — always visible. */
   protected readonly publicLinks = [
     { path: '/explore', label: 'Explore Events', icon: 'travel_explore' },
   ];
 
-  /** Auth nav links — only when logged in. */
   protected readonly authLinks = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { path: '/create-event', label: 'Create Event', icon: 'add_circle' },
     { path: '/my-bookings', label: 'My Bookings', icon: 'confirmation_number' },
   ];
 
-  /** Guest nav links — only when logged out. */
   protected readonly guestLinks = [
     { path: '/login', label: 'Sign In', icon: 'login' },
     { path: '/register', label: 'Create Account', icon: 'person_add' },
@@ -62,7 +59,7 @@ export class App {
     if (this.isLoggedIn()) {
       return [...this.publicLinks, ...this.authLinks];
     }
-    return [...this.publicLinks, ...this.guestLinks];
+    return this.publicLinks;
   });
 
   protected onNavClick(): void {
@@ -73,5 +70,6 @@ export class App {
 
   protected logout(): void {
     this.authService.logout();
+    this.onNavClick();
   }
 }

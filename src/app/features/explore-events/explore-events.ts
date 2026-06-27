@@ -8,6 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { EventService, EventListItem } from '../../shared/services/event.service';
 import { BookingService } from '../../shared/services/booking.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-explore-events',
@@ -20,6 +21,7 @@ export class ExploreEvents {
   private readonly bookingService = inject(BookingService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   protected readonly isLoggedIn = this.authService.isLoggedIn;
   protected readonly bookingInProgress = signal<string | null>(null);
@@ -43,11 +45,13 @@ export class ExploreEvents {
 
   protected async bookEvent(event: EventListItem): Promise<void> {
     if (!this.isLoggedIn()) {
+      this.toast.info('Sign in to book tickets.');
       this.router.navigate(['/login']);
       return;
     }
 
     if (!event.ticketTiers.length) {
+      this.toast.info('No tickets are available for this event.');
       return;
     }
 
@@ -58,10 +62,11 @@ export class ExploreEvents {
       // Book 1 ticket of the first tier by default
       await this.bookingService.bookEvent(event.id, event.ticketTiers[0].id, 1);
       this.bookingSuccess.set(event.id);
+      this.toast.success('Ticket booked successfully.');
 
       setTimeout(() => this.bookingSuccess.set(null), 3000);
     } catch (err) {
-      console.error('Booking failed:', err);
+      this.toast.apiError(err, 'Booking failed. Please try again.');
     } finally {
       this.bookingInProgress.set(null);
     }

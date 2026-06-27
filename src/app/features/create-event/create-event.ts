@@ -1,5 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, resource, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  resource,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   applyEach,
   debounce,
@@ -24,6 +32,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { environment } from '../../../environments/environment';
 import { EventService } from '../../shared/services/event.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { FormCheckbox, FormInput, FormSelect, FormDatepicker } from '../../shared/form-controls';
 import {
   categoryOptions,
@@ -54,6 +63,8 @@ import {
 export class CreateEvent {
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly toast = inject(ToastService);
 
   protected readonly appName = environment.appName;
   protected readonly maxTicketTiers = environment.maxTicketTiers;
@@ -62,8 +73,24 @@ export class CreateEvent {
   protected readonly formatOptions = formatOptions;
 
   protected readonly eventModel = signal<EventData>(createEventData());
-  protected readonly submittedEvent = signal<EventData | undefined>(undefined);
   protected readonly saveStatus = signal<SaveStatus>('idle');
+  protected readonly loadError = signal('');
+  protected readonly editEventId = signal<string | null>(this.route.snapshot.paramMap.get('id'));
+  protected readonly isEditMode = computed(() => this.editEventId() !== null);
+  protected readonly pageTitle = computed(() =>
+    this.isEditMode() ? 'Edit Event' : 'Create Event',
+  );
+  protected readonly pageDescription = computed(() =>
+    this.isEditMode()
+      ? 'Update your event details, tickets, guest list, and schedule.'
+      : 'Set up your event with tickets, guest lists, and all the details in one place.',
+  );
+  protected readonly submitLabel = computed(() =>
+    this.isEditMode() ? 'Save Changes' : 'Create Event',
+  );
+  protected readonly savingLabel = computed(() =>
+    this.isEditMode() ? 'Saving...' : 'Creating...',
+  );
 
   private readonly selectedCategory = computed(() => this.eventModel().event.category);
   protected readonly suggestedVenue = linkedSignal(() => suggestedVenues[this.selectedCategory()]);
@@ -89,11 +116,15 @@ export class CreateEvent {
           params: emailValue,
           loader: async ({ params }) => {
             await new Promise((resolve) => setTimeout(resolve, 300));
-            return environment.reservedEmails.includes(params.trim().toLowerCase());
+            return (
+              !this.isEditMode() && environment.reservedEmails.includes(params.trim().toLowerCase())
+            );
           },
         }),
       onSuccess: (isReserved) =>
-        isReserved ? { kind: 'reservedEmail', message: 'This email is already registered as an organizer' } : undefined,
+        isReserved
+          ? { kind: 'reservedEmail', message: 'This email is already registered as an organizer' }
+          : undefined,
       onError: () => ({ kind: 'emailCheckFailed', message: 'Email check failed' }),
     });
 
@@ -144,6 +175,10 @@ export class CreateEvent {
       const eventDate = new Date(rawDate);
       if (Number.isNaN(eventDate.getTime())) {
         return { kind: 'invalidDate', message: 'Enter a valid date' };
+      }
+
+      if (this.isEditMode()) {
+        return undefined;
       }
 
       const earliest = new Date();
@@ -199,17 +234,27 @@ export class CreateEvent {
               return 'empty';
             }
             await new Promise((resolve) => setTimeout(resolve, 400));
-            return environment.promoCodes.includes(params.trim().toUpperCase()) ? 'valid' : 'invalid';
+            return environment.promoCodes.includes(params.trim().toUpperCase())
+              ? 'valid'
+              : 'invalid';
           },
         }),
       onSuccess: (result) =>
-        result === 'invalid' ? { kind: 'invalidPromo', message: 'Promo code not recognized' } : undefined,
+        result === 'invalid'
+          ? { kind: 'invalidPromo', message: 'Promo code not recognized' }
+          : undefined,
       onError: () => ({ kind: 'promoCheckFailed', message: 'Promo check failed' }),
     });
 
     required(path.terms.agreeToTerms, { message: 'You must agree to the terms' });
   });
 
+  constructor() {
+    const eventId = this.editEventId();
+    if (eventId) {
+      void this.loadEvent(eventId);
+    }
+  }
 
   protected readonly completionPercent = computed(() => {
     const event = this.eventModel();
@@ -234,7 +279,7 @@ export class CreateEvent {
       if (!v) {
         return false;
       }
-      const str = typeof v === 'string' ? v : (v instanceof Date ? v.toISOString() : String(v));
+      const str = typeof v === 'string' ? v : v instanceof Date ? v.toISOString() : String(v);
       return str.trim().length > 0;
     }).length;
     return Math.round((completed / values.length) * 100);
@@ -259,11 +304,6 @@ export class CreateEvent {
       extras.parking ? 'Parking' : '',
       extras.recording ? 'Recording' : '',
     ].filter(Boolean);
-  });
-
-  protected readonly submittedJson = computed(() => {
-    const event = this.submittedEvent();
-    return event ? JSON.stringify(event, null, 2) : '';
   });
 
   protected useSuggestedVenue(): void {
@@ -307,7 +347,6 @@ export class CreateEvent {
   protected resetForm(): void {
     this.eventModel.set(createEventData());
     this.eventForm().reset();
-    this.submittedEvent.set(undefined);
     this.saveStatus.set('idle');
   }
 
@@ -315,15 +354,81 @@ export class CreateEvent {
     submit(this.eventForm, async () => {
       this.saveStatus.set('saving');
       try {
-        const result = await this.eventService.createEvent(this.eventModel());
-        this.submittedEvent.set(this.eventModel());
+        const eventId = this.editEventId();
+        if (eventId) {
+          await this.eventService.updateEvent(eventId, this.eventModel());
+        } else {
+          await this.eventService.createEvent(this.eventModel());
+        }
         this.saveStatus.set('saved');
-        // Navigate to dashboard after a short delay so user sees the success state
+        this.toast.success(this.isEditMode() ? 'Event updated successfully.' : 'Event created successfully.');
         setTimeout(() => this.router.navigate(['/dashboard']), 1200);
       } catch (err) {
-        console.error('Create event failed:', err);
+        this.toast.apiError(
+          err,
+          this.isEditMode()
+            ? 'Could not update event. Please try again.'
+            : 'Could not create event. Please try again.',
+        );
         this.saveStatus.set('idle');
       }
     });
+  }
+
+  private async loadEvent(id: string): Promise<void> {
+    try {
+      const event: any = await this.eventService.getEvent(id);
+      this.eventModel.set(this.toEventData(event));
+    } catch (err) {
+      const message = 'Could not load this event for editing.';
+      this.loadError.set(message);
+      this.toast.apiError(err, message);
+    }
+  }
+
+  private toEventData(event: any): EventData {
+    return {
+      event: {
+        title: event.title ?? '',
+        organizer: event.organizer ?? '',
+        email: event.email ?? '',
+        phone: event.phone ?? '',
+        category: event.category ?? 'conference',
+        format: event.format ?? 'in-person',
+      },
+      venue: {
+        name: event.venueName ?? '',
+        address: event.venueAddress ?? '',
+        city: event.venueCity ?? '',
+        zipCode: event.venueZipCode ?? '',
+        streamUrl: event.streamUrl ?? '',
+        date: event.date ?? '',
+        startTime: event.startTime ?? '',
+        endTime: event.endTime ?? '',
+      },
+      tickets: event.ticketTiers?.length
+        ? event.ticketTiers.map((ticket: any) => ({
+            tierName: ticket.tierName ?? '',
+            price: Number(ticket.price ?? 0),
+            quantity: Number(ticket.quantity ?? 1),
+          }))
+        : [{ tierName: '', price: 0, quantity: 1 }],
+      guests: event.guests?.length
+        ? event.guests.map((guest: any) => ({
+            name: guest.name ?? '',
+            email: guest.email ?? '',
+          }))
+        : [{ name: '', email: '' }],
+      extras: {
+        catering: event.catering ?? false,
+        parking: event.parking ?? false,
+        recording: event.recording ?? false,
+        promoCode: event.promoCode ?? '',
+      },
+      terms: {
+        agreeToTerms: true,
+        newsletter: true,
+      },
+    };
   }
 }

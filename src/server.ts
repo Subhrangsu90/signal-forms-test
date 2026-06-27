@@ -9,9 +9,9 @@ import express from 'express';
 import { join } from 'node:path';
 
 // API routers
-import { authRouter } from './server/routes/auth';
-import { eventsRouter } from './server/routes/events';
-import { bookingsRouter } from './server/routes/bookings';
+import { authRouter } from './server/modules/auth/auth.routes';
+import { eventsRouter } from './server/modules/events/events.routes';
+import { bookingsRouter } from './server/modules/bookings/bookings.routes';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -72,3 +72,6 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
  * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
  */
 export const reqHandler = createNodeRequestHandler(app);
+
+
+

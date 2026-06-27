@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AuthService } from '../../shared/services/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,7 @@ import { AuthService } from '../../shared/services/auth.service';
 export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   protected readonly email = signal('');
   protected readonly password = signal('');
@@ -28,9 +30,12 @@ export class Login {
 
     try {
       await this.authService.login(this.email(), this.password());
+      this.toast.success('Signed in successfully.');
       this.router.navigate(['/dashboard']);
     } catch (err: any) {
-      this.error.set(err?.error?.error || 'Login failed. Please try again.');
+      const message = err?.error?.error || 'Login failed. Please try again.';
+      this.error.set(message);
+      this.toast.error(message);
     } finally {
       this.loading.set(false);
     }

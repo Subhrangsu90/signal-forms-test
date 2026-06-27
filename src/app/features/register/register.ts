@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AuthService } from '../../shared/services/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -15,6 +16,7 @@ import { AuthService } from '../../shared/services/auth.service';
 export class Register {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   protected readonly name = signal('');
   protected readonly email = signal('');
@@ -28,12 +30,16 @@ export class Register {
     this.error.set('');
 
     if (this.password() !== this.confirmPassword()) {
-      this.error.set('Passwords do not match');
+      const message = 'Passwords do not match';
+      this.error.set(message);
+      this.toast.error(message);
       return;
     }
 
     if (this.password().length < 6) {
-      this.error.set('Password must be at least 6 characters');
+      const message = 'Password must be at least 6 characters';
+      this.error.set(message);
+      this.toast.error(message);
       return;
     }
 
@@ -41,9 +47,12 @@ export class Register {
 
     try {
       await this.authService.register(this.name(), this.email(), this.password());
+      this.toast.success('Account created successfully.');
       this.router.navigate(['/dashboard']);
     } catch (err: any) {
-      this.error.set(err?.error?.error || 'Registration failed. Please try again.');
+      const message = err?.error?.error || 'Registration failed. Please try again.';
+      this.error.set(message);
+      this.toast.error(message);
     } finally {
       this.loading.set(false);
     }

@@ -18,6 +18,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'events/:id/edit',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: 'my-bookings',
     renderMode: RenderMode.Client,
   },

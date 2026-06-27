@@ -7,6 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { environment } from '../../../environments/environment';
 import { BookingService, BookingItem } from '../../shared/services/booking.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-my-bookings',
@@ -17,6 +18,7 @@ import { BookingService, BookingItem } from '../../shared/services/booking.servi
 export class MyBookings {
   protected readonly appName = environment.appName;
   private readonly bookingService = inject(BookingService);
+  private readonly toast = inject(ToastService);
 
   private readonly refreshTrigger = signal(0);
 
@@ -54,8 +56,9 @@ export class MyBookings {
     try {
       await this.bookingService.cancelBooking(id);
       this.refreshTrigger.update((v) => v + 1);
+      this.toast.success('Booking cancelled successfully.');
     } catch (err) {
-      console.error('Cancel failed:', err);
+      this.toast.apiError(err, 'Could not cancel booking. Please try again.');
     }
   }
 }

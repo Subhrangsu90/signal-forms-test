@@ -4,14 +4,20 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <p class="text-sm text-slate-400 font-medium mb-1">{{ appName }}</p>
-        <h1 id="create-event-title" class="text-3xl font-bold tracking-tight m-0">Create Event</h1>
-        <p class="text-sm text-slate-400 m-0 mt-1">Set up your event with tickets, guest lists, and all the details in one place.</p>
+        <h1 id="create-event-title" class="text-3xl font-bold tracking-tight m-0">
+          {{ pageTitle() }}
+        </h1>
+        <p class="text-sm text-slate-400 m-0 mt-1">{{ pageDescription() }}</p>
       </div>
 
       <div class="flex flex-col gap-1 items-end min-w-[160px]">
         <span class="text-xs font-semibold text-slate-400">Completion</span>
         <strong class="text-2xl font-bold text-indigo-400">{{ completionPercent() }}%</strong>
-        <mat-progress-bar mode="determinate" [value]="completionPercent()" class="w-40 h-2 rounded-full"></mat-progress-bar>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="completionPercent()"
+          class="w-40 h-2 rounded-full"
+        ></mat-progress-bar>
       </div>
     </div>
   </mat-card>
@@ -20,22 +26,53 @@
   <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
     <!-- Form Side -->
     <mat-card appearance="outlined" class="p-6">
+      @if (loadError()) {
+        <div class="auth-error">
+          <mat-icon>error</mat-icon>
+          {{ loadError() }}
+        </div>
+      }
+
       <form class="grid gap-8" (submit)="onSubmit(); $event.preventDefault()" novalidate>
-
-
         <!-- Section 1: Event Basics -->
         <fieldset class="border-0 p-0 m-0 grid gap-4">
           <legend class="text-lg font-bold text-indigo-300 mb-2">1. Event Basics</legend>
           <div class="grid gap-4 sm:grid-cols-2">
             <div class="sm:col-span-2">
-              <app-form-input label="Event Title" placeholder="e.g. Angular Signals Summit" [field]="eventForm.event.title" />
+              <app-form-input
+                label="Event Title"
+                placeholder="e.g. Angular Signals Summit"
+                [field]="eventForm.event.title"
+              />
             </div>
-            <app-form-input label="Organizer Name" autocomplete="name" [field]="eventForm.event.organizer" />
-            <app-form-input label="Organizer Email" type="email" autocomplete="email" [field]="eventForm.event.email" />
-            <app-form-input label="Phone Number" type="tel" autocomplete="tel" [field]="eventForm.event.phone" />
-            <app-form-select label="Category" [options]="categoryOptions" [field]="eventForm.event.category" />
+            <app-form-input
+              label="Organizer Name"
+              autocomplete="name"
+              [field]="eventForm.event.organizer"
+            />
+            <app-form-input
+              label="Organizer Email"
+              type="email"
+              autocomplete="email"
+              [field]="eventForm.event.email"
+            />
+            <app-form-input
+              label="Phone Number"
+              type="tel"
+              autocomplete="tel"
+              [field]="eventForm.event.phone"
+            />
+            <app-form-select
+              label="Category"
+              [options]="categoryOptions"
+              [field]="eventForm.event.category"
+            />
             <div class="sm:col-span-2">
-              <app-form-select label="Event Format" [options]="formatOptions" [field]="eventForm.event.format" />
+              <app-form-select
+                label="Event Format"
+                [options]="formatOptions"
+                [field]="eventForm.event.format"
+              />
             </div>
           </div>
         </fieldset>
@@ -48,7 +85,11 @@
           <div class="grid gap-4 sm:grid-cols-2">
             @if (!eventForm.venue.name().hidden()) {
               <div class="sm:col-span-2 flex flex-col gap-2">
-                <app-form-input label="Venue Name" placeholder="e.g. Grand Convention Center" [field]="eventForm.venue.name" />
+                <app-form-input
+                  label="Venue Name"
+                  placeholder="e.g. Grand Convention Center"
+                  [field]="eventForm.venue.name"
+                />
                 <button
                   mat-stroked-button
                   color="accent"
@@ -63,23 +104,48 @@
             }
 
             @if (!eventForm.venue.address().hidden()) {
-              <app-form-input label="Street Address" autocomplete="street-address" [field]="eventForm.venue.address" />
+              <app-form-input
+                label="Street Address"
+                autocomplete="street-address"
+                [field]="eventForm.venue.address"
+              />
             }
             @if (!eventForm.venue.city().hidden()) {
-              <app-form-input label="City" autocomplete="address-level2" [field]="eventForm.venue.city" />
+              <app-form-input
+                label="City"
+                autocomplete="address-level2"
+                [field]="eventForm.venue.city"
+              />
             }
             @if (!eventForm.venue.zipCode().hidden()) {
-              <app-form-input label="ZIP Code" placeholder="12345" inputMode="numeric" [field]="eventForm.venue.zipCode" />
+              <app-form-input
+                label="ZIP Code"
+                placeholder="12345"
+                inputMode="numeric"
+                [field]="eventForm.venue.zipCode"
+              />
             }
             @if (!eventForm.venue.streamUrl().hidden()) {
               <div class="sm:col-span-2">
-                <app-form-input label="Stream URL" placeholder="https://stream.example.com/live" [field]="eventForm.venue.streamUrl" />
+                <app-form-input
+                  label="Stream URL"
+                  placeholder="https://stream.example.com/live"
+                  [field]="eventForm.venue.streamUrl"
+                />
               </div>
             }
 
             <app-form-datepicker label="Event Date" [field]="eventForm.venue.date" />
-            <app-form-input label="Start Time (HH:MM)" placeholder="09:00" [field]="eventForm.venue.startTime" />
-            <app-form-input label="End Time (HH:MM)" placeholder="17:00" [field]="eventForm.venue.endTime" />
+            <app-form-input
+              label="Start Time (HH:MM)"
+              placeholder="09:00"
+              [field]="eventForm.venue.startTime"
+            />
+            <app-form-input
+              label="End Time (HH:MM)"
+              placeholder="17:00"
+              [field]="eventForm.venue.endTime"
+            />
           </div>
         </fieldset>
 
@@ -102,10 +168,26 @@
 
           <div class="grid gap-4">
             @for (ticket of eventForm.tickets; track $index) {
-              <div class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_120px_120px_auto] items-start">
-                <app-form-input label="Tier Name" placeholder="e.g. VIP Pass" [field]="ticket.tierName" />
-                <app-form-input label="Price ($)" type="number" inputMode="decimal" [field]="ticket.price" />
-                <app-form-input label="Quantity" type="number" inputMode="numeric" [field]="ticket.quantity" />
+              <div
+                class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_120px_120px_auto] items-start"
+              >
+                <app-form-input
+                  label="Tier Name"
+                  placeholder="e.g. VIP Pass"
+                  [field]="ticket.tierName"
+                />
+                <app-form-input
+                  label="Price ($)"
+                  type="number"
+                  inputMode="decimal"
+                  [field]="ticket.price"
+                />
+                <app-form-input
+                  label="Quantity"
+                  type="number"
+                  inputMode="numeric"
+                  [field]="ticket.quantity"
+                />
                 <button
                   mat-icon-button
                   color="warn"
@@ -140,9 +222,16 @@
 
           <div class="grid gap-4">
             @for (guest of eventForm.guests; track $index) {
-              <div class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_1fr_auto] items-start">
+              <div
+                class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-[1fr_1fr_auto] items-start"
+              >
                 <app-form-input label="Name" autocomplete="name" [field]="guest.name" />
-                <app-form-input label="Email" type="email" autocomplete="email" [field]="guest.email" />
+                <app-form-input
+                  label="Email"
+                  type="email"
+                  autocomplete="email"
+                  [field]="guest.email"
+                />
                 <button
                   mat-icon-button
                   color="warn"
@@ -163,23 +252,37 @@
         <!-- Section 5: Extras -->
         <fieldset class="border-0 p-0 m-0 grid gap-4">
           <legend class="text-lg font-bold text-indigo-300 mb-2">5. Extras</legend>
-          <div class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-3">
+          <div
+            class="grid gap-4 p-4 bg-slate-900/40 rounded-lg border border-slate-800 sm:grid-cols-3"
+          >
             <app-form-checkbox label="Catering Included" [field]="eventForm.extras.catering" />
             @if (!eventForm.extras.parking().hidden()) {
               <app-form-checkbox label="Parking Passes" [field]="eventForm.extras.parking" />
             }
             <app-form-checkbox label="Video Recording" [field]="eventForm.extras.recording" />
           </div>
-          <app-form-input label="Promo Code" placeholder="e.g. VIP50" [field]="eventForm.extras.promoCode" />
+          <app-form-input
+            label="Promo Code"
+            placeholder="e.g. VIP50"
+            [field]="eventForm.extras.promoCode"
+          />
         </fieldset>
 
         <mat-divider></mat-divider>
 
         <!-- Section 6: Terms & Submit -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4"
+        >
           <div class="grid gap-2">
-            <app-form-checkbox label="I agree to the terms & conditions" [field]="eventForm.terms.agreeToTerms" />
-            <app-form-checkbox label="Subscribe to the event newsletter" [field]="eventForm.terms.newsletter" />
+            <app-form-checkbox
+              label="I agree to the terms & conditions"
+              [field]="eventForm.terms.agreeToTerms"
+            />
+            <app-form-checkbox
+              label="Subscribe to the event newsletter"
+              [field]="eventForm.terms.newsletter"
+            />
           </div>
 
           <div class="flex gap-3">
@@ -188,12 +291,14 @@
               mat-flat-button
               color="primary"
               type="submit"
-              [disabled]="eventForm().invalid() || eventForm().pending() || saveStatus() === 'saving'"
+              [disabled]="
+                eventForm().invalid() || eventForm().pending() || saveStatus() === 'saving'
+              "
             >
               @if (saveStatus() === 'saving') {
-                Creating...
+                {{ savingLabel() }}
               } @else {
-                Create Event
+                {{ submitLabel() }}
               }
             </button>
           </div>
@@ -206,17 +311,23 @@
       <div class="grid gap-6 auto-rows-max">
         <mat-card appearance="outlined" class="p-6">
           <mat-card-header class="p-0 mb-4">
-            <mat-card-title class="text-base font-bold text-indigo-300">Live Summary</mat-card-title>
+            <mat-card-title class="text-base font-bold text-indigo-300"
+              >Live Summary</mat-card-title
+            >
           </mat-card-header>
           <mat-card-content class="p-0">
             <dl class="grid gap-4 text-sm m-0">
               <div class="grid grid-cols-[100px_1fr] gap-2">
                 <dt class="text-slate-400">Event</dt>
-                <dd class="m-0 font-semibold">{{ eventModel().event.title || 'Untitled Event' }}</dd>
+                <dd class="m-0 font-semibold">
+                  {{ eventModel().event.title || 'Untitled Event' }}
+                </dd>
               </div>
               <div class="grid grid-cols-[100px_1fr] gap-2">
                 <dt class="text-slate-400">Organizer</dt>
-                <dd class="m-0 font-semibold text-slate-200">{{ eventModel().event.organizer || '—' }}</dd>
+                <dd class="m-0 font-semibold text-slate-200">
+                  {{ eventModel().event.organizer || '—' }}
+                </dd>
               </div>
               <div class="grid grid-cols-[100px_1fr] gap-2">
                 <dt class="text-slate-400">Format</dt>
@@ -264,26 +375,13 @@
                   } @else if (eventForm().invalid()) {
                     Needs Review
                   } @else if (saveStatus() === 'saved') {
-                    Created ✓
+                    {{ isEditMode() ? 'Updated' : 'Created' }} ✓
                   } @else {
                     Ready
                   }
                 </dd>
               </div>
             </dl>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card appearance="outlined" class="p-6">
-          <mat-card-header class="p-0 mb-4">
-            <mat-card-title class="text-base font-bold text-indigo-300">Submitted Event JSON</mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="p-0">
-            @if (submittedEvent()) {
-              <div class="code-preview">{{ submittedJson() }}</div>
-            } @else {
-              <p class="text-sm text-slate-400 m-0">Submit a valid event to preview the saved data.</p>
-            }
           </mat-card-content>
         </mat-card>
       </div>

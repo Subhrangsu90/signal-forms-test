@@ -40,6 +40,13 @@ export const routes: Routes = [
       import('./features/create-event/create-event').then((c) => c.CreateEvent),
   },
   {
+    path: 'events/:id/edit',
+    title: 'Edit Event — EventSync',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/create-event/create-event').then((c) => c.CreateEvent),
+  },
+  {
     path: 'my-bookings',
     title: 'My Bookings — EventSync',
     canActivate: [authGuard],

@@ -17,8 +17,43 @@ export interface EventListItem {
   endTime: string;
   guests: number;
   ticketTiers: Array<{ id: string; tierName: string; price: string; quantity: number }>;
+  ticketsLeft: number;
+  ticketsSold: number;
   revenue: number;
   createdAt: string;
+}
+
+export interface EventSalesReport {
+  event: {
+    id: string;
+    title: string;
+    date: string;
+    status: string;
+  };
+  totals: {
+    ticketsLeft: number;
+    ticketsSold: number;
+    revenue: number;
+    buyers: number;
+  };
+  tickets: Array<{
+    id: string;
+    tierName: string;
+    price: string;
+    left: number;
+    sold: number;
+    revenue: number;
+  }>;
+  buyers: Array<{
+    bookingId: string;
+    userId: string;
+    name: string;
+    email: string;
+    ticketTier: string;
+    quantity: number;
+    totalPrice: string;
+    bookedAt: string;
+  }>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,6 +73,11 @@ export class EventService {
   /** Public — get a single event by ID. */
   getEvent(id: string): Promise<any> {
     return firstValueFrom(this.http.get(`/api/events/${id}`));
+  }
+
+  /** Auth — get sales, inventory, and buyer details for an owned event. */
+  getEventSales(id: string): Promise<EventSalesReport> {
+    return firstValueFrom(this.http.get<EventSalesReport>(`/api/events/${id}/sales`));
   }
 
   /** Auth — create a new event. */
